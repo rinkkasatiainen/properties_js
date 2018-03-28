@@ -52,8 +52,31 @@ Rantly.choose(*vals)   # Pick one value from among vals.
 ```ruby
 # checks that integer only generates fixnum.
 property_of {
-  integer
+  integer  # generator
 }.check { |i|
   assert_kind_of Integer, i, "integer property did not return Integer type"
 }
+```
+
+## generators
+
+Generators are used to create a valid/invalid input - a set of input values which should, when processed, 
+hold a given property. For example - in CoinChanger, all input values more than 6 EUR should return more than
+2 pieces of 2EUR coins.
+
+So far the only way I have found to create custom generators is to patch Rantly instances:
+
+```ruby
+module CoinGenerator
+  def coin_generator
+    range(10,600) / 10 * 10
+  end
+  def a_random_coin
+    Rantly{ coin_generator }
+  end
+end
+# include generators to Rantly
+class Rantly
+  include CoinGenerator
+end
 ```
